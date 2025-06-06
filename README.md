@@ -1,3 +1,6 @@
+![github](https://img.shields.io/badge/GitHub-000000.svg?style=for-the-badge&logo=GitHub&logoColor=white)
+![markdown](https://img.shields.io/badge/Markdown-000000.svg?style=for-the-badge&logo=Markdown&logoColor=white)
+
 # How to Use `create-mern-project` Script Globally
 
 Follow these steps to run the `create-mern-project.sh` script from **any folder** in your system as a global command.
@@ -56,3 +59,5 @@ To check your PATH, run:
 ```bash
 echo $PATH
 ```
+
+<p align="center"><a href="https://github.com/hritesh-saha/tw-mern-starter/blob/main/LICENSE"><img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=BSD-3-Clause&logoColor=d9e0ee&colorA=363a4f&colorB=b7bdf8"/></a></p>
