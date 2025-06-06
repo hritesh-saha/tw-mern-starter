@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# Exit on error
+set -e
+
+# Trap errors and print message with line number
+trap 'echo "❌ Script failed at line $LINENO. Please check the error above." >&2' ERR
+
+# ----------------- Backend Setup -----------------
+echo "🛠 Setting up backend with folder structure and configs..."
+read -p "Enter project name: " project_name
+
+# Create root folder
+mkdir "$project_name"
+cd "$project_name"
+
+# Initialize npm and install dependencies
+if npm init -y; then
+  echo "📦 Installing backend packages..."
+  npm install express cors dotenv mongoose
+  npm install --save-dev nodemon
+else
+  echo "❌ npm init failed."
+  exit 1
+fi
+
+# Add type module at top
+sed -i '1s/{/{\n  "type": "module",/' package.json
+
+# Add nodemon start script under scripts block
+sed -i '/"scripts": {/a \    "start": "nodemon index.js",' package.json
+
+# Create folder structure
+mkdir routes models configs utilities Controllers middlewares
+
+# MongoDB config file
+cat > configs/db.js <<EOL
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
+const DB_URI = process.env.DB_URI;
+
+const connectDB = async () => {
+  try {
+    const con = await mongoose.connect(DB_URI);
+    console.log('MongoDB Connected');
+  } catch (error) {
+    console.error('MongoDB Connection Error:', error);
+    process.exit(1);
+  }
+}
+
+export default connectDB;
+EOL
+
+# Basic server file
+cat > index.js <<EOL
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+dotenv.config();
+
+import connectDB from './configs/db.js';
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+connectDB();
+
+app.get('/', (req, res) => {
+  res.send('API is working!');
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(\`Server running on port \${PORT}\`));
+EOL
+
+# .env for backend
+cat > .env <<EOL
+PORT=5000
+DB_URI=mongodb://localhost:27017/${project_name}
+EOL
+
+# Backend .gitignore
+cat > .gitignore <<EOL
+node_modules/
+.env
+.DS_Store
+EOL
+
+# nodemon config
+cat > nodemon.json <<EOL
+{
+  "watch": ["index.js", "routes", "models", "configs", "utilities", "Controllers"],
+  "ext": "js,json",
+  "ignore": ["node_modules/"],
+  "exec": "node index.js"
+}
+EOL
+
+
+# ----------------- Done -----------------
+echo "🎉 $project_name created with Express + MongoDB!"
+echo "🗃️  .gitignore file has been added to $project_name"
