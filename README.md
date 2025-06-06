@@ -79,6 +79,9 @@ If you only need to set up the frontend or backend individually, you can use the
 
 These scripts can also be made globally executable by following the same steps outlined above.
 
+### 🔄 Update Instructions
+
+If you make any custom changes to the scripts, please refer to the included `update.txt` file for detailed steps on how to set up and apply those changes correctly.
 
 
 <p align="center"><a href="https://github.com/hritesh-saha/tw-mern-starter/blob/main/LICENSE"><img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=BSD-3-Clause&logoColor=d9e0ee&colorA=363a4f&colorB=b7bdf8"/></a></p>
