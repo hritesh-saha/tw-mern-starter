@@ -3,6 +3,10 @@
 # Exit on error
 set -e
 
+# Trap errors and print message with line number
+trap 'echo "❌ Script failed at line $LINENO. Please check the error above." >&2' ERR
+
+# ----------------- Project Setup -----------------
 echo "🔧 Creating Vite + React frontend..."
 read -p "Enter project name: " project_name
 
@@ -11,26 +15,47 @@ mkdir "$project_name"
 cd "$project_name"
 
 # ----------------- Frontend Setup -----------------
-mkdir client
-cd client
+echo "📁 Setting up frontend..."
+mkdir client && cd client
 
 npm create vite@latest . -- --template react
 npm install
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
+npm install -D tailwindcss postcss autoprefixer @tailwindcss/postcss
 
-# Add Tailwind config to tailwind.config.js
-echo "✅ Configuring Tailwind..."
-sed -i.bak 's/content: \[\]/content: \[".\/index.html", ".\/src\/*.{js,ts,jsx,tsx}"\]/' tailwind.config.js
+# ✅ Manually create Tailwind and PostCSS config files
+echo "✅ Creating Tailwind and PostCSS config files..."
 
-# Inject Tailwind into styles
-cat > src/index.css <<EOL
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+# tailwind.config.js
+cat > tailwind.config.js <<EOL
+/** @type {import('tailwindcss').Config} */
+export default {
+    content: [
+      "./index.html",
+      "./src/**/*.{js,jsx,ts,tsx}",
+    ],
+    theme: {
+      extend: {},
+    },
+    plugins: [],
+};
 EOL
 
-# Add frontend .gitignore
+# postcss.config.js
+cat > postcss.config.js <<EOL
+import tailwindcssPostcss from "@tailwindcss/postcss";
+import autoprefixer from "autoprefixer";
+
+export default {
+  plugins: [tailwindcssPostcss, autoprefixer],
+};
+EOL
+
+# Create index.css with import
+cat > src/index.css <<EOL
+@import "tailwindcss";
+EOL
+
+# Add .gitignore to frontend
 cat > .gitignore <<EOL
 node_modules/
 dist/
@@ -42,22 +67,25 @@ EOL
 cd ..
 
 # ----------------- Backend Setup -----------------
-echo "🛠 Setting up backend with extended folder structure and configs..."
-mkdir server
-cd server
+echo "🛠 Setting up backend with folder structure and configs..."
+mkdir server && cd server
 
-# Initialize npm and install packages
-npm init -y
-npm install express cors dotenv mongoose
+# Initialize npm and install dependencies
+if npm init -y; then
+  echo "📦 Installing backend packages..."
+  npm install express cors dotenv mongoose
+else
+  echo "❌ npm init failed."
+  exit 1
+fi
 
-# Insert "type": "module" and "scripts": {...} just after the opening {
-# Using sed with GNU/Linux syntax:
+# Update package.json with module type and scripts
 sed -i '1s/{/{\n  "type": "module",\n  "scripts": {\n    "start": "nodemon index.js"\n  },/' package.json
 
 # Create folder structure
 mkdir routes models configs utilities Controllers middlewares
 
-# Create db.js in configs/ with ES module style
+# MongoDB config file
 cat > configs/db.js <<EOL
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -77,7 +105,7 @@ const connectDB = async () => {
 export default connectDB;
 EOL
 
-# Create basic server index.js (using ES modules now)
+# Basic server file
 cat > index.js <<EOL
 import express from 'express';
 import cors from 'cors';
@@ -90,7 +118,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
 connectDB();
 
 app.get('/', (req, res) => {
@@ -101,20 +128,20 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(\`Server running on port \${PORT}\`));
 EOL
 
-# .env example
+# .env for backend
 cat > .env <<EOL
 PORT=5000
 DB_URI=mongodb://localhost:27017/${project_name}
 EOL
 
-# Add backend .gitignore
+# Backend .gitignore
 cat > .gitignore <<EOL
 node_modules/
 .env
 .DS_Store
 EOL
 
-# Create nodemon.json
+# nodemon config
 cat > nodemon.json <<EOL
 {
   "watch": ["index.js", "routes", "models", "configs", "utilities", "Controllers"],
@@ -126,5 +153,6 @@ EOL
 
 cd ..
 
+# ----------------- Done -----------------
 echo "🎉 $project_name created with Vite + Tailwind + Express!"
 echo "🗃️  .gitignore files have been added to both client/ and server/"
