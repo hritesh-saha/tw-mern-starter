@@ -74,6 +74,7 @@ mkdir server && cd server
 if npm init -y; then
   echo "📦 Installing backend packages..."
   npm install express cors dotenv mongoose
+  npm install --save-dev nodemon
 else
   echo "❌ npm init failed."
   exit 1
@@ -83,7 +84,7 @@ fi
 sed -i '1s/{/{\n  "type": "module",/' package.json
 
 # Add nodemon start script under scripts block
-sed -i '/"scripts": {/a \    "start": "nodemon index.js",' package.json
+sed -i '/"scripts": {/a \    "start": "npx nodemon index.js",' package.json
 
 # Create folder structure
 mkdir routes models configs utilities Controllers middlewares
