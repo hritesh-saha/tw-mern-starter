@@ -79,8 +79,11 @@ else
   exit 1
 fi
 
-# Update package.json with module type and scripts
-sed -i '1s/{/{\n  "type": "module",\n  "scripts": {\n    "start": "nodemon index.js"\n  },/' package.json
+# Add type module at top
+sed -i '1s/{/{\n  "type": "module",/' package.json
+
+# Add nodemon start script under scripts block
+sed -i '/"scripts": {/a \    "start": "nodemon index.js",' package.json
 
 # Create folder structure
 mkdir routes models configs utilities Controllers middlewares
