@@ -74,7 +74,7 @@ mkdir server && cd server
 if npm init -y; then
   echo "📦 Installing backend packages..."
   npm install express cors dotenv mongoose
-  npm install -g nodemon
+  npm install --save-dev nodemon
 else
   echo "❌ npm init failed."
   exit 1
