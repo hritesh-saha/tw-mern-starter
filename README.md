@@ -52,12 +52,23 @@ Now you can execute the script from any directory using:
 ```bash
 create-mern-project
 ```
-### Notes
+### 🛠️ Debug Tip: Check if `~/.local/bin` is in your PATH
 
-To check your PATH, run:
+If the command doesn’t work after setup, check your PATH:
 
 ```bash
 echo $PATH
 ```
+
+> ⚠️ **Known Issue: Ctrl+C Not Working in VS Code WSL Bash Terminal**
+>
+> When using **WSL with the Bash terminal inside VS Code**, signals like `SIGINT` (e.g., pressing `Ctrl+C` to stop the server) may **not work correctly**. This issue occurs because the signal doesn’t properly propagate from VS Code’s integrated terminal to child processes like `nodemon` or `node`.
+>
+> ✅ **Workaround for Windows Users:**
+> Use an actual **WSL terminal (Ubuntu)** launched from your Start Menu or by running `wsl` in PowerShell or Command Prompt instead of the integrated terminal in VS Code.
+>
+> 🐧 **Note for Linux Users:**
+> This issue typically **does not occur on native Linux systems**, as the terminal signal handling works correctly outside of the WSL environment.
+
 
 <p align="center"><a href="https://github.com/hritesh-saha/tw-mern-starter/blob/main/LICENSE"><img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=BSD-3-Clause&logoColor=d9e0ee&colorA=363a4f&colorB=b7bdf8"/></a></p>
